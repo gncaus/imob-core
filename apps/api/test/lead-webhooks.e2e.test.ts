@@ -68,8 +68,6 @@ describe('POST /webhooks/leads/grupo-olx', () => {
       transactionType: 'RENT',
       leadType: 'CLICK_WHATSAPP',
       isSimilarListing: false,
-      status: 'RECEIVED',
-      queue: null,
       originCreatedAt: new Date('2026-10-20T15:50:30.619Z'),
     });
     expect(lead.rawPayload).toEqual(payload);

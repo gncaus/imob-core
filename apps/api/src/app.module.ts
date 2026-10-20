@@ -4,6 +4,7 @@ import { ConfigModule } from './common/config/config.module.js';
 import { DomainExceptionFilter } from './common/errors/domain-exception.filter.js';
 import { LoggerModule } from './common/logger/logger.module.js';
 import { PrismaModule } from './common/prisma/prisma.module.js';
+import { QueueModule } from './common/queue/queue.module.js';
 import { StorageModule } from './common/storage/storage.module.js';
 import { AgentsModule } from './modules/agents/agents.module.js';
 import { AuthModule } from './modules/auth/auth.module.js';
@@ -17,6 +18,7 @@ import { PropertiesModule } from './modules/properties/properties.module.js';
     ConfigModule,
     LoggerModule,
     PrismaModule,
+    QueueModule,
     StorageModule,
     HealthModule,
     AuthModule,

@@ -14,8 +14,18 @@ export interface TestApp {
   http: () => ReturnType<typeof request>;
 }
 
-export async function createTestApp(): Promise<TestApp> {
-  const moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
+/** Troca a implementação de um provider (ex.: um notifier espião). */
+export interface ProviderOverride {
+  provide: abstract new (...args: never[]) => unknown;
+  useValue: unknown;
+}
+
+export async function createTestApp(overrides: ProviderOverride[] = []): Promise<TestApp> {
+  let builder = Test.createTestingModule({ imports: [AppModule] });
+  for (const { provide, useValue } of overrides) {
+    builder = builder.overrideProvider(provide).useValue(useValue);
+  }
+  const moduleRef = await builder.compile();
   const app = moduleRef.createNestApplication<INestApplication<Server>>({ logger: false });
   configureApp(app);
   await app.init();

@@ -12,6 +12,7 @@ const validEnv = {
   COMPANY_NAME: 'Imobiliária Teste',
   COMPANY_EMAIL: 'contato@imobiliaria.test',
   GRUPO_OLX_WEBHOOK_SECRET: 'segredo-do-webhook-de-teste',
+  REDIS_URL: 'redis://localhost:6379',
 };
 
 describe('parseConfig', () => {
@@ -26,6 +27,7 @@ describe('parseConfig', () => {
       S3_REGION: 'us-east-1',
       API_PUBLIC_URL: 'http://localhost:3333',
       FEED_CACHE_TTL_SECONDS: 300,
+      QUEUE_PREFIX: 'imob',
     });
   });
 

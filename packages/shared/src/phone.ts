@@ -9,3 +9,13 @@ export const brazilianPhoneSchema = z
   .transform((value) => value.replace(/\D/g, ''))
   .transform((digits) => (digits.length > 11 && digits.startsWith('55') ? digits.slice(2) : digits))
   .pipe(z.string().regex(/^[1-9]{2}9?\d{8}$/, 'Telefone inválido: informe DDD + número'));
+
+/**
+ * Link para abrir conversa no WhatsApp: https://wa.me/55<ddd><telefone>.
+ * Devolve `null` quando não há DDD + número suficientes para um telefone brasileiro.
+ */
+export function whatsappLink(ddd: string | null, phone: string | null): string | null {
+  const digits = `${ddd ?? ''}${phone ?? ''}`.replace(/\D/g, '');
+  if (digits.length < 10 || digits.length > 11) return null;
+  return `https://wa.me/55${digits}`;
+}

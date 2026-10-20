@@ -46,6 +46,11 @@ const envSchema = z
 
     /** Chave secreta do webhook de leads do Grupo OLX (vem no Basic Auth de cada requisição). */
     GRUPO_OLX_WEBHOOK_SECRET: z.string().min(16, 'use pelo menos 16 caracteres'),
+
+    /** Redis usado pelas filas (BullMQ). */
+    REDIS_URL: z.url({ protocol: /^rediss?$/ }),
+    /** Prefixo das chaves das filas no Redis (separa ambientes que compartilham o Redis). */
+    QUEUE_PREFIX: z.string().min(1).default('imob'),
   })
   .superRefine((env, ctx) => {
     if (env.NODE_ENV !== 'production') return;

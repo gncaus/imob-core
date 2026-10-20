@@ -22,6 +22,9 @@ export function testEnv(): Record<string, string> {
     // Bucket separado para os testes não misturarem fotos com o ambiente de desenvolvimento.
     S3_BUCKET: 'imob-photos-test',
     GRUPO_OLX_WEBHOOK_SECRET: GRUPO_OLX_TEST_SECRET,
+    REDIS_URL: process.env.REDIS_URL ?? 'redis://localhost:6379',
+    // Filas separadas das de desenvolvimento no mesmo Redis.
+    QUEUE_PREFIX: 'imob-test',
     COMPANY_NAME: 'Imobiliária Teste',
     COMPANY_EMAIL: 'contato@imobiliaria.test',
     // Sem cache nos testes: cada requisição reflete o banco.
