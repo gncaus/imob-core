@@ -13,6 +13,11 @@ export default [
       ...nextPlugin.configs.recommended.rules,
       ...nextPlugin.configs['core-web-vitals'].rules,
       ...reactHooks.configs.recommended.rules,
+      // Handlers assíncronos em props de JSX (onSubmit, onClick) são o padrão no React.
+      '@typescript-eslint/no-misused-promises': [
+        'error',
+        { checksVoidReturn: { attributes: false } },
+      ],
     },
   },
 ];
