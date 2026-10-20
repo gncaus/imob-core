@@ -1,0 +1,208 @@
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  moduleFormat        = "cjs"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  ADMIN
+  AGENT
+}
+
+enum AgentQueue {
+  RENTAL
+  SALES
+}
+
+enum LeadQueue {
+  RENTAL
+  SALES
+  TRIAGE
+}
+
+enum PropertyPurpose {
+  SALE
+  RENT
+  SALE_RENT
+}
+
+enum DisplayAddress {
+  ALL
+  STREET
+  NEIGHBORHOOD
+}
+
+enum PublicationType {
+  STANDARD
+  PREMIUM
+  SUPER_PREMIUM
+  PREMIERE_1
+  PREMIERE_2
+  TRIPLE
+}
+
+enum LeadSource {
+  GRUPO_OLX
+  SITE
+  MANUAL
+}
+
+enum LeadTransactionType {
+  RENT
+  SELL
+}
+
+enum LeadTemperature {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum LeadStatus {
+  /// Persistido pelo webhook, aguardando o job de roteamento.
+  RECEIVED
+  /// Fila definida (e corretor atribuído, se houver um ativo).
+  ROUTED
+}
+
+model User {
+  id           String   @id @default(uuid(7)) @db.Uuid
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         UserRole
+  createdAt    DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime @updatedAt @db.Timestamptz(3)
+
+  agent Agent?
+
+  @@map("users")
+}
+
+model Agent {
+  id         String     @id @default(uuid(7)) @db.Uuid
+  userId     String     @unique @db.Uuid
+  queue      AgentQueue
+  active     Boolean    @default(true)
+  /// Apenas dígitos, com DDD e sem o código do país.
+  whatsapp   String
+  /// Usado pela roleta: o corretor ativo com o valor mais antigo (ou nulo) recebe o próximo lead.
+  lastLeadAt DateTime?  @db.Timestamptz(3)
+  createdAt  DateTime   @default(now()) @db.Timestamptz(3)
+  updatedAt  DateTime   @updatedAt @db.Timestamptz(3)
+
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  leads Lead[]
+
+  @@index([queue, active, lastLeadAt])
+  @@map("agents")
+}
+
+model Property {
+  id              String          @id @default(uuid(7)) @db.Uuid
+  /// Código estável do imóvel; vira o ListingID do feed VRSync.
+  code            String          @unique @db.VarChar(50)
+  title           String          @db.VarChar(100)
+  description     String?
+  purpose         PropertyPurpose
+  propertyType    String?
+  propertySubtype String?
+
+  /// Valores monetários em centavos. Venda em BigInt porque passa do limite de Int (R$ 21 mi).
+  salePriceCents   BigInt?
+  rentPriceCents   Int?
+  condoFeeCents    Int?
+  iptuCents        Int?
+
+  /// Áreas em m².
+  usableArea Decimal? @db.Decimal(10, 2)
+  totalArea  Decimal? @db.Decimal(10, 2)
+  bedrooms   Int?
+  suites     Int?
+  bathrooms  Int?
+  parkingSpots Int?
+
+  /// CEP apenas com dígitos.
+  postalCode     String?        @db.VarChar(8)
+  /// Sigla da UF (ex.: ES).
+  state          String?        @db.VarChar(2)
+  city           String?
+  neighborhood   String?
+  street         String?
+  streetNumber   String?
+  complement     String?
+  latitude       Float?
+  longitude      Float?
+  displayAddress DisplayAddress @default(ALL)
+
+  publicationType  PublicationType @default(STANDARD)
+  publishToPortals Boolean         @default(false)
+
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+
+  photos PropertyPhoto[]
+  leads  Lead[]
+
+  @@index([publishToPortals])
+  @@map("properties")
+}
+
+model PropertyPhoto {
+  id          String  @id @default(uuid(7)) @db.Uuid
+  propertyId  String  @db.Uuid
+  /// Inclui o hash do conteúdo: trocar a imagem gera nova chave e nova URL (o portal identifica a foto pela URL).
+  storageKey  String  @unique
+  contentType String
+  sizeBytes   Int
+  position    Int
+  isPrimary   Boolean @default(false)
+  caption     String?
+  createdAt   DateTime @default(now()) @db.Timestamptz(3)
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@index([propertyId, position])
+  @@map("property_photos")
+}
+
+model Lead {
+  id              String               @id @default(uuid(7)) @db.Uuid
+  source          LeadSource
+  /// Identificador do lead no sistema de origem; chave de idempotência junto com `source`.
+  originLeadId    String?
+  clientListingId String?
+  propertyId      String?              @db.Uuid
+  name            String?
+  email           String?
+  ddd             String?
+  phone           String?
+  message         String?
+  transactionType LeadTransactionType?
+  /// Canal do lead no portal (extraData.leadType), ex.: MCMV_OLX.
+  leadType        String?
+  temperature     LeadTemperature?
+  /// Lead de imóvel semelhante sugerido pelo portal (extraData.leadCerto).
+  isSimilarListing Boolean             @default(false)
+  /// Nulo até o job de roteamento rodar.
+  queue           LeadQueue?
+  agentId         String?              @db.Uuid
+  routingReason   String?
+  rawPayload      Json
+  status          LeadStatus           @default(RECEIVED)
+  routedAt        DateTime?            @db.Timestamptz(3)
+  createdAt       DateTime             @default(now()) @db.Timestamptz(3)
+  updatedAt       DateTime             @updatedAt @db.Timestamptz(3)
+
+  property Property? @relation(fields: [propertyId], references: [id], onDelete: SetNull)
+  agent    Agent?    @relation(fields: [agentId], references: [id], onDelete: SetNull)
+
+  @@unique([source, originLeadId])
+  @@index([queue, status, createdAt])
+  @@map("leads")
+}

@@ -1,0 +1,18 @@
+node_modules/
+dist/
+.next/
+.turbo/
+coverage/
+*.tsbuildinfo
+next-env.d.ts
+
+# Prisma client gerado
+apps/api/src/generated/
+
+# Variáveis de ambiente
+.env
+.env.*
+!.env.example
+
+*.log
+.DS_Store
