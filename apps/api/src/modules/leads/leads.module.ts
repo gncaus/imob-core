@@ -9,18 +9,21 @@ import {
 } from './lead-routing.queue.js';
 import { LeadRoutingService } from './lead-routing.service.js';
 import { LeadWebhooksController } from './lead-webhooks.controller.js';
+import { LeadsController } from './leads.controller.js';
+import { LeadsService } from './leads.service.js';
 import { LeadNotifier } from './notifications/lead-notifier.js';
 import { LogNotifier } from './notifications/log-notifier.js';
 
 @Module({
   imports: [BullModule.registerQueue({ name: LEAD_ROUTING_QUEUE })],
-  controllers: [LeadWebhooksController],
+  controllers: [LeadWebhooksController, LeadsController],
   providers: [
     LeadIngestionService,
     GrupoOlxWebhookGuard,
     LeadRoutingQueue,
     LeadRoutingService,
     LeadRoutingProcessor,
+    LeadsService,
     { provide: LeadNotifier, useClass: LogNotifier },
   ],
 })

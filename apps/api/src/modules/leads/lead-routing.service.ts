@@ -1,13 +1,22 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { type LeadQueue, whatsappLink } from '@imob/shared';
 import { PrismaService } from '../../common/prisma/prisma.service.js';
-import { pickNextAgent } from '../agents/roulette.js';
+import { type AssignedAgent, assignNextAgent, lockLead } from './agent-assignment.js';
 import { MCMV_ORIGIN } from './grupo-olx/grupo-olx-payload.js';
-import { type LeadAssignedNotification, LeadNotifier } from './notifications/lead-notifier.js';
+import { LeadNotifier } from './notifications/lead-notifier.js';
 import { routeLead } from './routing.js';
 
 export type RoutingOutcome =
   { status: 'ROUTED'; queue: LeadQueue; agentId: string | null } | { status: 'SKIPPED' };
+
+export interface AssignmentNotice {
+  leadId: string;
+  queue: LeadQueue;
+  agent: AssignedAgent;
+  propertyCode: string | null;
+  ddd: string | null;
+  phone: string | null;
+}
 
 @Injectable()
 export class LeadRoutingService {
@@ -25,7 +34,7 @@ export class LeadRoutingService {
   async route(leadId: string, now = new Date()): Promise<RoutingOutcome> {
     const result = await this.prisma.$transaction(async (tx) => {
       // Trava o lead: dois jobs para o mesmo lead não roteiam duas vezes.
-      await tx.$queryRaw`SELECT id FROM leads WHERE id = ${leadId}::uuid FOR UPDATE`;
+      await lockLead(tx, leadId);
       const lead = await tx.lead.findUnique({
         where: { id: leadId },
         include: { property: { select: { code: true, purpose: true } } },
@@ -39,26 +48,17 @@ export class LeadRoutingService {
         clientListingId: lead.clientListingId,
         property: lead.property,
       });
+      const agent =
+        decision.queue === 'TRIAGE' ? null : await assignNextAgent(tx, decision.queue, now);
 
-      let agent: { id: string; whatsapp: string; user: { name: string } } | null = null;
-      if (decision.queue !== 'TRIAGE') {
-        // Trava a roleta da fila: leads simultâneos não caem no mesmo corretor.
-        await tx.$queryRaw`SELECT 1 FROM pg_advisory_xact_lock(hashtext(${`lead-roulette:${decision.queue}`}))`;
-        const candidates = await tx.agent.findMany({
-          where: { queue: decision.queue, active: true },
-          include: { user: { select: { name: true } } },
-        });
-        agent = pickNextAgent(candidates);
-        if (agent) await tx.agent.update({ where: { id: agent.id }, data: { lastLeadAt: now } });
-      }
-
-      const reason = agent ? decision.reason : withoutAgentNote(decision.queue, decision.reason);
       await tx.lead.update({
         where: { id: leadId },
         data: {
           queue: decision.queue,
           agentId: agent?.id ?? null,
-          routingReason: reason,
+          routingReason: agent
+            ? decision.reason
+            : withoutAgentNote(decision.queue, decision.reason),
           status: 'ROUTED',
           routedAt: now,
         },
@@ -76,24 +76,42 @@ export class LeadRoutingService {
       { leadId, propertyId: lead.propertyId, queue, agentId: agent?.id ?? null },
       'Lead roteado',
     );
-
     if (agent) {
-      const notification: LeadAssignedNotification = {
+      await this.notifyAssigned({
         leadId,
         queue,
-        agent: { id: agent.id, name: agent.user.name, whatsapp: agent.whatsapp },
+        agent,
         propertyCode: lead.property?.code ?? null,
-        customerWhatsappLink: whatsappLink(lead.ddd, lead.phone),
-      };
-      // O lead já está roteado; uma falha no aviso não pode desfazer isso nem travar o job.
-      await this.notifier.leadAssigned(notification).catch((error: unknown) => {
-        this.logger.error({ err: error, leadId, agentId: agent.id }, 'Falha ao avisar o corretor');
+        ddd: lead.ddd,
+        phone: lead.phone,
       });
     }
     return { status: 'ROUTED', queue, agentId: agent?.id ?? null };
   }
+
+  /** O lead já está atribuído; uma falha no aviso não pode desfazer isso nem travar o job. */
+  async notifyAssigned(notice: AssignmentNotice): Promise<void> {
+    await this.notifier
+      .leadAssigned({
+        leadId: notice.leadId,
+        queue: notice.queue,
+        agent: {
+          id: notice.agent.id,
+          name: notice.agent.user.name,
+          whatsapp: notice.agent.whatsapp,
+        },
+        propertyCode: notice.propertyCode,
+        customerWhatsappLink: whatsappLink(notice.ddd, notice.phone),
+      })
+      .catch((error: unknown) => {
+        this.logger.error(
+          { err: error, leadId: notice.leadId, agentId: notice.agent.id },
+          'Falha ao avisar o corretor',
+        );
+      });
+  }
 }
 
-function withoutAgentNote(queue: LeadQueue, reason: string): string {
+export function withoutAgentNote(queue: LeadQueue, reason: string): string {
   return queue === 'TRIAGE' ? reason : `${reason}. Sem corretor ativo na fila: aguardando dono`;
 }
