@@ -19,6 +19,10 @@ export function testEnv(): Record<string, string> {
     LOGIN_RATE_LIMIT_PER_MINUTE: '1000',
     // Bucket separado para os testes não misturarem fotos com o ambiente de desenvolvimento.
     S3_BUCKET: 'imob-photos-test',
+    COMPANY_NAME: 'Imobiliária Teste',
+    COMPANY_EMAIL: 'contato@imobiliaria.test',
+    // Sem cache nos testes: cada requisição reflete o banco.
+    FEED_CACHE_TTL_SECONDS: '0',
     PHOTOS_PUBLIC_BASE_URL: `${process.env.S3_ENDPOINT ?? 'http://localhost:9000'}/imob-photos-test`,
   };
 }

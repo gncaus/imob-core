@@ -9,6 +9,8 @@ const validEnv = {
   S3_SECRET_KEY: 'imob-secret',
   S3_BUCKET: 'imob-photos',
   PHOTOS_PUBLIC_BASE_URL: 'http://localhost:9000/imob-photos',
+  COMPANY_NAME: 'Imobiliária Teste',
+  COMPANY_EMAIL: 'contato@imobiliaria.test',
 };
 
 describe('parseConfig', () => {
@@ -21,6 +23,8 @@ describe('parseConfig', () => {
       SESSION_TTL_SECONDS: 28_800,
       LOGIN_RATE_LIMIT_PER_MINUTE: 10,
       S3_REGION: 'us-east-1',
+      API_PUBLIC_URL: 'http://localhost:3333',
+      FEED_CACHE_TTL_SECONDS: 300,
     });
   });
 

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListingDataFeed xmlns="http://www.vivareal.com/schemas/1.0/VRSync" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vivareal.com/schemas/1.0/VRSync http://xml.vivareal.com/vrsync.xsd">
+  <Header>
+    <Provider>Imob Core</Provider>
+    <Email>contato@imobiliaria.test</Email>
+    <ContactName><![CDATA[Imobiliária Exemplo]]></ContactName>
+    <PublishDate>2026-10-20T10:30:00</PublishDate>
+    <Telephone>(27) 3333-4444</Telephone>
+  </Header>
+  <Listings>
+    <Listing>
+      <ListingID>VV-101</ListingID>
+      <Title><![CDATA[Apartamento 3 quartos na Praia da Costa]]></Title>
+      <TransactionType>For Sale</TransactionType>
+      <PublicationType>STANDARD</PublicationType>
+      <Media>
+        <Item medium="image" caption="Fachada" primary="true">https://fotos.imob.test/properties/VV-101/foto-1.jpg</Item>
+        <Item medium="image">https://fotos.imob.test/properties/VV-101/foto-2.jpg</Item>
+        <Item medium="image">https://fotos.imob.test/properties/VV-101/foto-3.jpg</Item>
+        <Item medium="image">https://fotos.imob.test/properties/VV-101/foto-4.jpg</Item>
+        <Item medium="image">https://fotos.imob.test/properties/VV-101/foto-5.jpg</Item>
+      </Media>
+      <Details>
+        <UsageType>Residential</UsageType>
+        <PropertyType>Residential / Apartment</PropertyType>
+        <Description><![CDATA[Apartamento amplo & nascente, a duas quadras da praia, com varanda gourmet e 2 vagas.]]></Description>
+        <ListPrice currency="BRL">850000</ListPrice>
+        <LivingArea unit="square metres">98</LivingArea>
+        <PropertyAdministrationFee currency="BRL">900</PropertyAdministrationFee>
+        <Iptu currency="BRL" period="Yearly">2400</Iptu>
+        <Bedrooms>3</Bedrooms>
+        <Bathrooms>2</Bathrooms>
+        <Suites>1</Suites>
+        <Garage type="Parking Space">2</Garage>
+      </Details>
+      <Location displayAddress="All">
+        <Country abbreviation="BR">Brasil</Country>
+        <State abbreviation="ES"><![CDATA[Espírito Santo]]></State>
+        <City><![CDATA[Vila Velha]]></City>
+        <Neighborhood><![CDATA[Praia da Costa]]></Neighborhood>
+        <Address><![CDATA[Avenida Antônio Gil Veloso]]></Address>
+        <StreetNumber><![CDATA[1200]]></StreetNumber>
+        <Complement><![CDATA[Apto 801]]></Complement>
+        <PostalCode>29101-010</PostalCode>
+        <Latitude>-20.3364</Latitude>
+        <Longitude>-40.2836</Longitude>
+      </Location>
+      <ContactInfo>
+        <Name><![CDATA[Imobiliária Exemplo]]></Name>
+        <Email>contato@imobiliaria.test</Email>
+        <Website>https://imobiliaria.test</Website>
+        <Telephone>(27) 3333-4444</Telephone>
+      </ContactInfo>
+    </Listing>
+    <Listing>
+      <ListingID>VIX-202</ListingID>
+      <Title><![CDATA[Sala comercial na Enseada do Suá]]></Title>
+      <TransactionType>For Rent</TransactionType>
+      <PublicationType>PREMIUM</PublicationType>
+      <Media>
+        <Item medium="image" caption="Fachada" primary="true">https://fotos.imob.test/properties/VIX-202/foto-1.jpg</Item>
+        <Item medium="image">https://fotos.imob.test/properties/VIX-202/foto-2.jpg</Item>
+        <Item medium="image">https://fotos.imob.test/properties/VIX-202/foto-3.jpg</Item>
+        <Item medium="image">https://fotos.imob.test/properties/VIX-202/foto-4.jpg</Item>
+        <Item medium="image">https://fotos.imob.test/properties/VIX-202/foto-5.jpg</Item>
+      </Media>
+      <Details>
+        <UsageType>Commercial</UsageType>
+        <PropertyType>Commercial / Office</PropertyType>
+        <Description><![CDATA[Sala comercial com vista para a baía, recepção, copa e banheiro privativo. Prédio com portaria.]]></Description>
+        <RentalPrice currency="BRL" period="Monthly">3500</RentalPrice>
+        <LivingArea unit="square metres">45</LivingArea>
+        <PropertyAdministrationFee currency="BRL">0</PropertyAdministrationFee>
+        <Bathrooms>1</Bathrooms>
+      </Details>
+      <Location displayAddress="Street">
+        <Country abbreviation="BR">Brasil</Country>
+        <State abbreviation="ES"><![CDATA[Espírito Santo]]></State>
+        <City><![CDATA[Vitória]]></City>
+        <Neighborhood><![CDATA[Enseada do Suá]]></Neighborhood>
+        <Address><![CDATA[Rua Constante Sodré]]></Address>
+        <PostalCode>29050-335</PostalCode>
+      </Location>
+      <ContactInfo>
+        <Name><![CDATA[Imobiliária Exemplo]]></Name>
+        <Email>contato@imobiliaria.test</Email>
+        <Website>https://imobiliaria.test</Website>
+        <Telephone>(27) 3333-4444</Telephone>
+      </ContactInfo>
+    </Listing>
+    <Listing>
+      <ListingID>VV-303</ListingID>
+      <Title><![CDATA[Terreno de esquina em Itapuã]]></Title>
+      <TransactionType>Sale/Rent</TransactionType>
+      <PublicationType>STANDARD</PublicationType>
+      <Media>
+        <Item medium="image" caption="Fachada" primary="true">https://fotos.imob.test/properties/VV-303/foto-1.jpg</Item>
+        <Item medium="image">https://fotos.imob.test/properties/VV-303/foto-2.jpg</Item>
+        <Item medium="image">https://fotos.imob.test/properties/VV-303/foto-3.jpg</Item>
+        <Item medium="image">https://fotos.imob.test/properties/VV-303/foto-4.jpg</Item>
+        <Item medium="image">https://fotos.imob.test/properties/VV-303/foto-5.jpg</Item>
+      </Media>
+      <Details>
+        <UsageType>Residential</UsageType>
+        <PropertyType>Residential / Land Lot</PropertyType>
+        <Description><![CDATA[Apartamento amplo & nascente, a duas quadras da praia, com varanda gourmet e 2 vagas.]]></Description>
+        <ListPrice currency="BRL">420000</ListPrice>
+        <RentalPrice currency="BRL" period="Monthly">1500</RentalPrice>
+        <LotArea unit="square metres">360</LotArea>
+        <PropertyAdministrationFee currency="BRL">900</PropertyAdministrationFee>
+        <Iptu currency="BRL" period="Yearly">2400</Iptu>
+      </Details>
+      <Location displayAddress="Neighborhood">
+        <Country abbreviation="BR">Brasil</Country>
+        <State abbreviation="ES"><![CDATA[Espírito Santo]]></State>
+        <City><![CDATA[Vila Velha]]></City>
+        <Neighborhood><![CDATA[Itapuã]]></Neighborhood>
+        <Address><![CDATA[Avenida Antônio Gil Veloso]]></Address>
+        <StreetNumber><![CDATA[1200]]></StreetNumber>
+        <Complement><![CDATA[Apto 801]]></Complement>
+        <PostalCode>29101-010</PostalCode>
+        <Latitude>-20.3364</Latitude>
+        <Longitude>-40.2836</Longitude>
+      </Location>
+      <ContactInfo>
+        <Name><![CDATA[Imobiliária Exemplo]]></Name>
+        <Email>contato@imobiliaria.test</Email>
+        <Website>https://imobiliaria.test</Website>
+        <Telephone>(27) 3333-4444</Telephone>
+      </ContactInfo>
+    </Listing>
+  </Listings>
+</ListingDataFeed>

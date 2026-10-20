@@ -8,6 +8,7 @@ import { StorageModule } from './common/storage/storage.module.js';
 import { AgentsModule } from './modules/agents/agents.module.js';
 import { AuthModule } from './modules/auth/auth.module.js';
 import { HealthModule } from './modules/health/health.module.js';
+import { PortalsModule } from './modules/portals/portals.module.js';
 import { PropertiesModule } from './modules/properties/properties.module.js';
 
 @Module({
@@ -20,6 +21,7 @@ import { PropertiesModule } from './modules/properties/properties.module.js';
     AuthModule,
     AgentsModule,
     PropertiesModule,
+    PortalsModule,
   ],
   providers: [{ provide: APP_FILTER, useClass: DomainExceptionFilter }],
 })

@@ -29,6 +29,20 @@ const envSchema = z
     S3_BUCKET: z.string().min(3),
     /** URL pública base das fotos (os portais baixam as imagens por ela), sem barra no final. */
     PHOTOS_PUBLIC_BASE_URL: z.url().transform((url) => url.replace(/\/+$/, '')),
+
+    /** URL pública da API, usada para mostrar o endereço do feed no painel. */
+    API_PUBLIC_URL: z
+      .url()
+      .default('http://localhost:3333')
+      .transform((url) => url.replace(/\/+$/, '')),
+    /** Por quanto tempo o XML do feed fica em cache antes de ser gerado de novo. */
+    FEED_CACHE_TTL_SECONDS: z.coerce.number().int().min(0).default(300),
+
+    /** Dados da imobiliária (ContactInfo do feed, obrigatório nos portais). */
+    COMPANY_NAME: z.string().trim().min(1),
+    COMPANY_EMAIL: z.email(),
+    COMPANY_PHONE: z.string().trim().min(1).optional(),
+    COMPANY_WEBSITE: z.url().optional(),
   })
   .refine((env) => env.NODE_ENV !== 'production' || !env.JWT_SECRET.startsWith('troque-'), {
     path: ['JWT_SECRET'],

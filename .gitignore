@@ -16,3 +16,6 @@ apps/api/src/generated/
 
 *.log
 .DS_Store
+
+# Estado local de ferramentas de IA (claude-flow)
+.claude-flow/
