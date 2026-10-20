@@ -43,10 +43,22 @@ const envSchema = z
     COMPANY_EMAIL: z.email(),
     COMPANY_PHONE: z.string().trim().min(1).optional(),
     COMPANY_WEBSITE: z.url().optional(),
+
+    /** Chave secreta do webhook de leads do Grupo OLX (vem no Basic Auth de cada requisição). */
+    GRUPO_OLX_WEBHOOK_SECRET: z.string().min(16, 'use pelo menos 16 caracteres'),
   })
-  .refine((env) => env.NODE_ENV !== 'production' || !env.JWT_SECRET.startsWith('troque-'), {
-    path: ['JWT_SECRET'],
-    message: 'troque o valor de exemplo do .env.example antes de rodar em produção',
+  .superRefine((env, ctx) => {
+    if (env.NODE_ENV !== 'production') return;
+    // Segredos com o valor de exemplo do .env.example não sobem em produção.
+    for (const key of ['JWT_SECRET', 'GRUPO_OLX_WEBHOOK_SECRET'] as const) {
+      if (env[key].startsWith('troque-')) {
+        ctx.addIssue({
+          code: 'custom',
+          path: [key],
+          message: 'troque o valor de exemplo do .env.example antes de rodar em produção',
+        });
+      }
+    }
   });
 
 export type AppConfig = Readonly<z.infer<typeof envSchema>>;

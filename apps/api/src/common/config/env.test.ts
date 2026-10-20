@@ -11,6 +11,7 @@ const validEnv = {
   PHOTOS_PUBLIC_BASE_URL: 'http://localhost:9000/imob-photos',
   COMPANY_NAME: 'Imobiliária Teste',
   COMPANY_EMAIL: 'contato@imobiliaria.test',
+  GRUPO_OLX_WEBHOOK_SECRET: 'segredo-do-webhook-de-teste',
 };
 
 describe('parseConfig', () => {
@@ -63,5 +64,15 @@ describe('parseConfig', () => {
     };
 
     expect(() => parseConfig(env)).toThrow(/JWT_SECRET/);
+  });
+
+  it('rejects the example webhook secret in production', () => {
+    const env = {
+      ...validEnv,
+      NODE_ENV: 'production',
+      GRUPO_OLX_WEBHOOK_SECRET: 'troque-esta-chave-do-webhook',
+    };
+
+    expect(() => parseConfig(env)).toThrow(/GRUPO_OLX_WEBHOOK_SECRET/);
   });
 });

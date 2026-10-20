@@ -175,8 +175,12 @@ model PropertyPhoto {
 model Lead {
   id               String               @id @default(uuid(7)) @db.Uuid
   source           LeadSource
+  /// Origem informada pelo portal (leadOrigin), ex.: "Grupo OLX" ou "MCMV_OLX".
+  origin           String?
   /// Identificador do lead no sistema de origem; chave de idempotência junto com `source`.
   originLeadId     String?
+  /// Quando o lead foi criado no portal (timestamp do payload).
+  originCreatedAt  DateTime?            @db.Timestamptz(3)
   clientListingId  String?
   propertyId       String?              @db.Uuid
   name             String?
@@ -185,7 +189,7 @@ model Lead {
   phone            String?
   message          String?
   transactionType  LeadTransactionType?
-  /// Canal do lead no portal (extraData.leadType), ex.: MCMV_OLX.
+  /// Canal do lead no portal (extraData.leadType), ex.: CONTACT_CHAT, CLICK_WHATSAPP.
   leadType         String?
   temperature      LeadTemperature?
   /// Lead de imóvel semelhante sugerido pelo portal (extraData.leadCerto).

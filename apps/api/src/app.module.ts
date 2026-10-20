@@ -8,6 +8,7 @@ import { StorageModule } from './common/storage/storage.module.js';
 import { AgentsModule } from './modules/agents/agents.module.js';
 import { AuthModule } from './modules/auth/auth.module.js';
 import { HealthModule } from './modules/health/health.module.js';
+import { LeadsModule } from './modules/leads/leads.module.js';
 import { PortalsModule } from './modules/portals/portals.module.js';
 import { PropertiesModule } from './modules/properties/properties.module.js';
 
@@ -22,6 +23,7 @@ import { PropertiesModule } from './modules/properties/properties.module.js';
     AgentsModule,
     PropertiesModule,
     PortalsModule,
+    LeadsModule,
   ],
   providers: [{ provide: APP_FILTER, useClass: DomainExceptionFilter }],
 })
