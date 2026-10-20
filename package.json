@@ -14,7 +14,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "db:migrate": "pnpm --filter @imob/api db:migrate",
-    "db:seed": "pnpm --filter @imob/api db:seed"
+    "db:seed": "pnpm --filter @imob/api db:seed",
+    "simulate:leads": "pnpm --filter @imob/scripts simulate:leads"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

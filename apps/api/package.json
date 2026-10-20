@@ -49,6 +49,7 @@
     "@types/pg": "^8.23.1",
     "@types/supertest": "^7.2.1",
     "fast-xml-parser": "^5.11.2",
+    "jpeg-js": "^0.4.4",
     "pg": "^8.23.1",
     "pino-pretty": "^13.2.0",
     "prisma": "^7.10.1",
