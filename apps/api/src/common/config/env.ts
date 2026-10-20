@@ -20,6 +20,15 @@ const envSchema = z
     COOKIE_SECURE: z.stringbool().optional(),
     /** Tentativas de login por IP a cada minuto. */
     LOGIN_RATE_LIMIT_PER_MINUTE: z.coerce.number().int().positive().default(10),
+
+    /** Armazenamento de fotos compatível com S3 (MinIO no ambiente local). */
+    S3_ENDPOINT: z.url(),
+    S3_REGION: z.string().min(1).default('us-east-1'),
+    S3_ACCESS_KEY: z.string().min(1),
+    S3_SECRET_KEY: z.string().min(1),
+    S3_BUCKET: z.string().min(3),
+    /** URL pública base das fotos (os portais baixam as imagens por ela), sem barra no final. */
+    PHOTOS_PUBLIC_BASE_URL: z.url().transform((url) => url.replace(/\/+$/, '')),
   })
   .refine((env) => env.NODE_ENV !== 'production' || !env.JWT_SECRET.startsWith('troque-'), {
     path: ['JWT_SECRET'],

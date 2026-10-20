@@ -10,12 +10,13 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "db:generate": "prisma generate",
-    "db:migrate": "prisma migrate dev",
+    "db:migrate": "prisma migrate dev && prisma generate",
     "db:seed": "prisma db seed",
     "db:deploy": "prisma migrate deploy",
     "postinstall": "prisma generate"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1154.0",
     "@imob/shared": "workspace:*",
     "@nestjs/common": "^11.2.7",
     "@nestjs/core": "^11.2.7",
@@ -40,6 +41,7 @@
     "@swc/core": "^1.16.18",
     "@types/cookie-parser": "^1.4.10",
     "@types/express": "^5.0.6",
+    "@types/multer": "^2.3.0",
     "@types/node": "^22.19.0",
     "@types/pg": "^8.23.1",
     "@types/supertest": "^7.2.1",

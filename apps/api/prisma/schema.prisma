@@ -104,27 +104,28 @@ model Agent {
 }
 
 model Property {
-  id              String          @id @default(uuid(7)) @db.Uuid
+  id           String          @id @default(uuid(7)) @db.Uuid
   /// Código estável do imóvel; vira o ListingID do feed VRSync.
-  code            String          @unique @db.VarChar(50)
-  title           String          @db.VarChar(100)
-  description     String?
-  purpose         PropertyPurpose
-  propertyType    String?
-  propertySubtype String?
+  code         String          @unique @db.VarChar(50)
+  title        String          @db.VarChar(100)
+  description  String?
+  purpose      PropertyPurpose
+  /// Valor VRSync completo, ex.: "Residential / Apartment" (lista em @imob/shared).
+  propertyType String?
 
   /// Valores monetários em centavos. Venda em BigInt porque passa do limite de Int (R$ 21 mi).
-  salePriceCents   BigInt?
-  rentPriceCents   Int?
-  condoFeeCents    Int?
-  iptuCents        Int?
+  salePriceCents BigInt?
+  rentPriceCents Int?
+  condoFeeCents  Int?
+  /// IPTU anual.
+  iptuCents      Int?
 
-  /// Áreas em m².
-  usableArea Decimal? @db.Decimal(10, 2)
-  totalArea  Decimal? @db.Decimal(10, 2)
-  bedrooms   Int?
-  suites     Int?
-  bathrooms  Int?
+  /// Áreas em m² inteiros, como o VRSync exige. Útil vira LivingArea; total vira LotArea.
+  usableArea   Int?
+  totalArea    Int?
+  bedrooms     Int?
+  suites       Int?
+  bathrooms    Int?
   parkingSpots Int?
 
   /// CEP apenas com dígitos.
@@ -154,14 +155,14 @@ model Property {
 }
 
 model PropertyPhoto {
-  id          String  @id @default(uuid(7)) @db.Uuid
-  propertyId  String  @db.Uuid
+  id          String   @id @default(uuid(7)) @db.Uuid
+  propertyId  String   @db.Uuid
   /// Inclui o hash do conteúdo: trocar a imagem gera nova chave e nova URL (o portal identifica a foto pela URL).
-  storageKey  String  @unique
+  storageKey  String   @unique
   contentType String
   sizeBytes   Int
   position    Int
-  isPrimary   Boolean @default(false)
+  isPrimary   Boolean  @default(false)
   caption     String?
   createdAt   DateTime @default(now()) @db.Timestamptz(3)
 
@@ -172,32 +173,32 @@ model PropertyPhoto {
 }
 
 model Lead {
-  id              String               @id @default(uuid(7)) @db.Uuid
-  source          LeadSource
+  id               String               @id @default(uuid(7)) @db.Uuid
+  source           LeadSource
   /// Identificador do lead no sistema de origem; chave de idempotência junto com `source`.
-  originLeadId    String?
-  clientListingId String?
-  propertyId      String?              @db.Uuid
-  name            String?
-  email           String?
-  ddd             String?
-  phone           String?
-  message         String?
-  transactionType LeadTransactionType?
+  originLeadId     String?
+  clientListingId  String?
+  propertyId       String?              @db.Uuid
+  name             String?
+  email            String?
+  ddd              String?
+  phone            String?
+  message          String?
+  transactionType  LeadTransactionType?
   /// Canal do lead no portal (extraData.leadType), ex.: MCMV_OLX.
-  leadType        String?
-  temperature     LeadTemperature?
+  leadType         String?
+  temperature      LeadTemperature?
   /// Lead de imóvel semelhante sugerido pelo portal (extraData.leadCerto).
-  isSimilarListing Boolean             @default(false)
+  isSimilarListing Boolean              @default(false)
   /// Nulo até o job de roteamento rodar.
-  queue           LeadQueue?
-  agentId         String?              @db.Uuid
-  routingReason   String?
-  rawPayload      Json
-  status          LeadStatus           @default(RECEIVED)
-  routedAt        DateTime?            @db.Timestamptz(3)
-  createdAt       DateTime             @default(now()) @db.Timestamptz(3)
-  updatedAt       DateTime             @updatedAt @db.Timestamptz(3)
+  queue            LeadQueue?
+  agentId          String?              @db.Uuid
+  routingReason    String?
+  rawPayload       Json
+  status           LeadStatus           @default(RECEIVED)
+  routedAt         DateTime?            @db.Timestamptz(3)
+  createdAt        DateTime             @default(now()) @db.Timestamptz(3)
+  updatedAt        DateTime             @updatedAt @db.Timestamptz(3)
 
   property Property? @relation(fields: [propertyId], references: [id], onDelete: SetNull)
   agent    Agent?    @relation(fields: [agentId], references: [id], onDelete: SetNull)

@@ -17,6 +17,9 @@ export function testEnv(): Record<string, string> {
     DATABASE_URL: databaseUrl,
     JWT_SECRET: 'test-secret-with-at-least-32-characters!',
     LOGIN_RATE_LIMIT_PER_MINUTE: '1000',
+    // Bucket separado para os testes não misturarem fotos com o ambiente de desenvolvimento.
+    S3_BUCKET: 'imob-photos-test',
+    PHOTOS_PUBLIC_BASE_URL: `${process.env.S3_ENDPOINT ?? 'http://localhost:9000'}/imob-photos-test`,
   };
 }
 

@@ -4,19 +4,30 @@ import { InvalidConfigError, parseConfig } from './env.js';
 const validEnv = {
   DATABASE_URL: 'postgresql://imob:imob@localhost:5432/imob',
   JWT_SECRET: 'a'.repeat(32),
+  S3_ENDPOINT: 'http://localhost:9000',
+  S3_ACCESS_KEY: 'imob',
+  S3_SECRET_KEY: 'imob-secret',
+  S3_BUCKET: 'imob-photos',
+  PHOTOS_PUBLIC_BASE_URL: 'http://localhost:9000/imob-photos',
 };
 
 describe('parseConfig', () => {
   it('applies defaults', () => {
     expect(parseConfig(validEnv)).toEqual({
+      ...validEnv,
       NODE_ENV: 'development',
       API_PORT: 3333,
       LOG_LEVEL: 'info',
-      DATABASE_URL: validEnv.DATABASE_URL,
-      JWT_SECRET: validEnv.JWT_SECRET,
       SESSION_TTL_SECONDS: 28_800,
       LOGIN_RATE_LIMIT_PER_MINUTE: 10,
+      S3_REGION: 'us-east-1',
     });
+  });
+
+  it('strips trailing slashes from the public photos url', () => {
+    const config = parseConfig({ ...validEnv, PHOTOS_PUBLIC_BASE_URL: 'https://cdn.imob.com/' });
+
+    expect(config.PHOTOS_PUBLIC_BASE_URL).toBe('https://cdn.imob.com');
   });
 
   it('coerces numbers and booleans from strings', () => {

@@ -9,7 +9,7 @@
     "emitDecoratorMetadata": true,
     "isolatedModules": false,
     "declaration": false,
-    "types": ["node"]
+    "types": ["node", "multer"]
   },
   "include": ["src", "test", "prisma", "prisma.config.ts", "vitest.config.ts"]
 }

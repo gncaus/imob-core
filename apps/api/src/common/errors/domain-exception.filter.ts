@@ -5,6 +5,7 @@ import {
   HttpException,
   HttpStatus,
   Logger,
+  PayloadTooLargeException,
 } from '@nestjs/common';
 import type { Response } from 'express';
 import {
@@ -46,6 +47,15 @@ export class DomainExceptionFilter implements ExceptionFilter {
       const body: ErrorBody = { error: { code: exception.code, message: exception.message } };
       if (exception instanceof ValidationError) body.error.issues = exception.issues;
       response.status(statusFor(exception)).json(body);
+      return;
+    }
+
+    // Limite de tamanho do upload (multer): mensagem em português no formato padrão.
+    if (exception instanceof PayloadTooLargeException) {
+      const body: ErrorBody = {
+        error: { code: 'PAYLOAD_TOO_LARGE', message: 'Arquivo maior que o tamanho permitido' },
+      };
+      response.status(HttpStatus.PAYLOAD_TOO_LARGE).json(body);
       return;
     }
 
