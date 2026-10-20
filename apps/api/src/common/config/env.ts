@@ -2,12 +2,29 @@ import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { z } from 'zod';
 
-const envSchema = z.object({
-  NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
-  API_PORT: z.coerce.number().int().min(1).max(65535).default(3333),
-  LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
-  DATABASE_URL: z.url({ protocol: /^postgres(ql)?$/ }),
-});
+const envSchema = z
+  .object({
+    NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+    API_PORT: z.coerce.number().int().min(1).max(65535).default(3333),
+    LOG_LEVEL: z
+      .enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent'])
+      .default('info'),
+    DATABASE_URL: z.url({ protocol: /^postgres(ql)?$/ }),
+    JWT_SECRET: z.string().min(32, 'use pelo menos 32 caracteres aleatórios'),
+    SESSION_TTL_SECONDS: z.coerce
+      .number()
+      .int()
+      .positive()
+      .default(8 * 60 * 60),
+    /** Por padrão o cookie de sessão só é `Secure` em produção. */
+    COOKIE_SECURE: z.stringbool().optional(),
+    /** Tentativas de login por IP a cada minuto. */
+    LOGIN_RATE_LIMIT_PER_MINUTE: z.coerce.number().int().positive().default(10),
+  })
+  .refine((env) => env.NODE_ENV !== 'production' || !env.JWT_SECRET.startsWith('troque-'), {
+    path: ['JWT_SECRET'],
+    message: 'troque o valor de exemplo do .env.example antes de rodar em produção',
+  });
 
 export type AppConfig = Readonly<z.infer<typeof envSchema>>;
 

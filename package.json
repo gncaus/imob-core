@@ -13,7 +13,8 @@
     "test": "turbo run test",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "db:migrate": "pnpm --filter @imob/api db:migrate"
+    "db:migrate": "pnpm --filter @imob/api db:migrate",
+    "db:seed": "pnpm --filter @imob/api db:seed"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
