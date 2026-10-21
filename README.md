@@ -7,19 +7,32 @@ Fatia vertical do sistema próprio de uma imobiliária que hoje usa o Imoview. O
 
 ## Como rodar
 
-Pré-requisitos: Node.js 22+, pnpm 10 e Docker.
+### Opção 1: só com Docker (para ver funcionando)
+
+Pré-requisito: Docker. Um único comando sobe banco, Redis, storage, API e painel. Na primeira subida, as migrações são aplicadas e o banco é populado sozinho.
+
+```bash
+docker compose --profile app up -d --build    # a primeira vez leva alguns minutos (build das imagens)
+docker compose exec api pnpm -w simulate:leads   # envia os leads de exemplo ao webhook
+```
+
+Depois abra http://localhost:3000. Para desligar, use `docker compose --profile app down`; com `-v`, os dados também são apagados.
+
+### Opção 2: desenvolvimento local
+
+Pré-requisitos: Node.js 22.12+, pnpm 10 (`corepack enable`) e Docker.
 
 ```bash
 pnpm install
 cp .env.example .env          # os valores padrão já funcionam localmente
-docker compose up -d          # postgres, redis, minio
+docker compose up -d          # só a infraestrutura: postgres, redis, minio
 pnpm db:migrate && pnpm db:seed
 pnpm dev                      # api em :3333, painel em :3000
 pnpm test
 pnpm simulate:leads           # com o pnpm dev rodando
 ```
 
-> Se a porta 5432 já estiver em uso por um Postgres local, defina `POSTGRES_PORT=5433` no `.env` e ajuste a porta no `DATABASE_URL`.
+> Se a porta 5432 já estiver em uso por um Postgres local, defina `POSTGRES_PORT=5433` no `.env` e ajuste a porta no `DATABASE_URL`. As duas opções usam as mesmas portas: rode uma de cada vez.
 
 | O quê               | Onde                                   | Acesso                                                                                 |
 | ------------------- | -------------------------------------- | -------------------------------------------------------------------------------------- |
@@ -47,7 +60,7 @@ O seed cria 1 admin, 4 corretores (2 por fila) e 8 imóveis em Vila Velha e Vit�
 - Abra o XML: ele traz `ListingDataFeed` no namespace VRSync, `TransactionType` por finalidade, preços em reais inteiros, CDATA nos textos com acento e exatamente uma foto `primary`.
 - Diga que este XML passou no validador oficial.
 
-**4. Leads chegando (1 min 30 s).** No terminal, rode `pnpm simulate:leads` e deixe a aba **Leads** aberta. O simulador envia ao webhook os cenários do enunciado e mostra o status HTTP e a fila de cada um:
+**4. Leads chegando (1 min 30 s).** No terminal, rode `pnpm simulate:leads` (ou `docker compose exec api pnpm -w simulate:leads`, na opção só com Docker) e deixe a aba **Leads** aberta. O simulador envia ao webhook os cenários do enunciado e mostra o status HTTP e a fila de cada um:
 
 | Cenário                                         | HTTP | Resultado                       |
 | ----------------------------------------------- | ---- | ------------------------------- |

@@ -17,6 +17,8 @@ const env = z
     SEED_ADMIN_EMAIL: z.email().default('admin@imob.local'),
     SEED_ADMIN_PASSWORD: z.string().min(8),
     SEED_AGENT_PASSWORD: z.string().min(8).default('corretor12345'),
+    /** No container, o seed roda a cada subida: só popula o banco vazio, sem desfazer edições. */
+    SEED_ONLY_IF_EMPTY: z.stringbool().default(false),
   })
   .parse(process.env);
 const config = parseConfig(process.env);
@@ -90,6 +92,10 @@ async function seedProperties(): Promise<void> {
 }
 
 async function main(): Promise<void> {
+  if (env.SEED_ONLY_IF_EMPTY && (await prisma.user.count()) > 0) {
+    console.log('Banco já populado: seed ignorado.');
+    return;
+  }
   await storage.onModuleInit();
   await seedAdmin();
   await seedAgents();
