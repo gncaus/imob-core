@@ -5,6 +5,10 @@ const SESSION_COOKIE = 'imob_session';
 /**
  * Redireciona para o login quem não tem cookie de sessão. A validade do token é conferida pela
  * API em cada chamada; aqui é só para não renderizar o painel para quem nunca entrou.
+ *
+ * O caminho inverso (quem tem cookie e abre /login ir para o painel) não é feito aqui: o cookie
+ * pode existir e estar inválido (expirado, usuário removido), e isso criaria um loop entre o
+ * login e o painel. A tela de login sempre abre.
  */
 export function proxy(request: NextRequest) {
   const hasSession = request.cookies.has(SESSION_COOKIE);
@@ -15,7 +19,6 @@ export function proxy(request: NextRequest) {
     url.searchParams.set('next', request.nextUrl.pathname);
     return NextResponse.redirect(url);
   }
-  if (hasSession && isLogin) return NextResponse.redirect(new URL('/imoveis', request.url));
   return NextResponse.next();
 }
 

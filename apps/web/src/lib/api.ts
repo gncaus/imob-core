@@ -32,6 +32,26 @@ async function toApiError(response: Response): Promise<ApiError> {
 
 type Method = 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
 
+let redirectingToLogin = false;
+
+/**
+ * Sessão expirada ou inválida: apaga o cookie (senão ele continua sendo enviado e a sessão nunca
+ * se resolve) e vai para o login com recarga completa, descartando o cache. Várias requisições
+ * que recebem 401 ao mesmo tempo disparam um único redirecionamento.
+ */
+async function goToLogin(): Promise<never> {
+  if (!redirectingToLogin) {
+    redirectingToLogin = true;
+    await fetch('/api/auth/logout', { method: 'POST', credentials: 'same-origin' }).catch(
+      () => undefined,
+    );
+    const next = encodeURIComponent(window.location.pathname);
+    window.location.replace(`/login?expired=1&next=${next}`);
+  }
+  // Fica pendente até a página trocar: a tela não chega a mostrar o erro.
+  return new Promise<never>(() => undefined);
+}
+
 /** Chama a API pelo proxy do Next (/api/*). Corpo `FormData` vai como multipart. */
 export async function api<T>(path: string, method: Method = 'GET', body?: unknown): Promise<T> {
   const isForm = body instanceof FormData;
@@ -42,11 +62,8 @@ export async function api<T>(path: string, method: Method = 'GET', body?: unknow
     body: body === undefined ? undefined : isForm ? body : JSON.stringify(body),
   });
 
-  if (response.status === 401 && path !== '/auth/login') {
-    // Sessão expirada ou inválida: volta para o login com recarga completa, descartando o cache.
-    // eslint-disable-next-line @next/next/no-location-assign-relative-destination
-    window.location.assign(`/login?next=${encodeURIComponent(window.location.pathname)}`);
-  }
+  // No login, 401 é só senha errada: o erro aparece no formulário.
+  if (response.status === 401 && path !== '/auth/login') return goToLogin();
   if (!response.ok) throw await toApiError(response);
   if (response.status === 204) return undefined as T;
   return (await response.json()) as T;

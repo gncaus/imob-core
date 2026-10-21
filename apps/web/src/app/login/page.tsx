@@ -14,7 +14,9 @@ import { useLogin } from '@/lib/session';
 
 function LoginForm() {
   const router = useRouter();
-  const next = useSearchParams().get('next');
+  const params = useSearchParams();
+  const next = params.get('next');
+  const expired = params.get('expired') === '1';
   const login = useLogin();
   const form = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
@@ -32,6 +34,11 @@ function LoginForm() {
   const { errors } = form.formState;
   return (
     <form onSubmit={onSubmit} className="grid gap-4" noValidate>
+      {expired && !login.isError && (
+        <p role="status" className="rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-800">
+          Sua sessão expirou. Entre novamente.
+        </p>
+      )}
       <div className="grid gap-2">
         <Label htmlFor="email">E-mail</Label>
         <Input id="email" type="email" autoComplete="email" {...form.register('email')} />
