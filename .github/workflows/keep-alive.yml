@@ -1,0 +1,24 @@
+# Mantém a demo acordada nos planos gratuitos: a API no Render dorme após 15 min sem acesso e o
+# Supabase pausa projetos sem atividade por uma semana. Configure a variável do repositório
+# API_PUBLIC_URL (Settings → Secrets and variables → Actions → Variables) com a URL da API.
+name: keep-alive
+
+on:
+  schedule:
+    - cron: '*/14 * * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    if: ${{ vars.API_PUBLIC_URL != '' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: API (acorda o serviço se estiver dormindo)
+        run: curl -fsS --retry 6 --retry-delay 20 --retry-all-errors --max-time 90 "${{ vars.API_PUBLIC_URL }}/health"
+
+      - name: Feed e uma foto (mantém o storage ativo)
+        run: |
+          feed=$(curl -fsS --max-time 60 "${{ vars.API_PUBLIC_URL }}/feeds/vrsync.xml")
+          photo=$(printf '%s' "$feed" | grep -o 'https://[^<]*\.jpg' | head -n 1)
+          if [ -n "$photo" ]; then curl -fsS -o /dev/null --max-time 60 "$photo"; fi

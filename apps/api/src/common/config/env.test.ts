@@ -44,6 +44,11 @@ describe('parseConfig', () => {
     expect(config.COOKIE_SECURE).toBe(true);
   });
 
+  it('uses the platform PORT when API_PORT is not set', () => {
+    expect(parseConfig({ ...validEnv, PORT: '10000' }).API_PORT).toBe(10000);
+    expect(parseConfig({ ...validEnv, PORT: '10000', API_PORT: '3333' }).API_PORT).toBe(3333);
+  });
+
   it('rejects a missing database url', () => {
     expect(() => parseConfig({ JWT_SECRET: validEnv.JWT_SECRET })).toThrow(InvalidConfigError);
   });

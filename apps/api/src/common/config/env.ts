@@ -79,7 +79,8 @@ export class InvalidConfigError extends Error {
 }
 
 export function parseConfig(env: NodeJS.ProcessEnv): AppConfig {
-  const result = envSchema.safeParse(env);
+  // Plataformas como Render e Heroku informam a porta em PORT; API_PORT, se definida, vence.
+  const result = envSchema.safeParse({ ...env, API_PORT: env.API_PORT ?? env.PORT });
   if (!result.success) {
     throw new InvalidConfigError(
       result.error.issues.map((issue) => `${issue.path.join('.')}: ${issue.message}`),

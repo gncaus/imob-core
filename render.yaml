@@ -1,0 +1,62 @@
+# Blueprint do Render: API (com o worker de roteamento) + Redis, no plano gratuito.
+# O painel fica na Vercel e o banco no Neon; o passo a passo está em DEPLOY.md.
+# Variáveis com `sync: false` são pedidas pelo Render ao criar o Blueprint.
+services:
+  - type: web
+    name: imob-api
+    runtime: docker
+    plan: free
+    region: ohio
+    dockerContext: .
+    dockerfilePath: ./apps/api/Dockerfile
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      # Connection string direta do Neon (sem pooling), com ?sslmode=require.
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: imob-redis
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: GRUPO_OLX_WEBHOOK_SECRET
+        generateValue: true
+      # URL pública desta API (ex.: https://imob-api.onrender.com), mostrada no painel como feed.
+      - key: API_PUBLIC_URL
+        sync: false
+      # Supabase Storage (compatível com S3). O bucket precisa existir e ser público.
+      - key: S3_ENDPOINT
+        sync: false
+      - key: S3_REGION
+        sync: false
+      - key: S3_ACCESS_KEY
+        sync: false
+      - key: S3_SECRET_KEY
+        sync: false
+      - key: S3_BUCKET
+        value: imob-photos
+      - key: PHOTOS_PUBLIC_BASE_URL
+        sync: false
+      - key: SEED_ADMIN_PASSWORD
+        sync: false
+      - key: SEED_AGENT_PASSWORD
+        sync: false
+      - key: COMPANY_NAME
+        value: Imobiliária Demo
+      - key: COMPANY_EMAIL
+        value: contato@imobiliaria-demo.com.br
+      - key: COMPANY_PHONE
+        value: (27) 3200-0000
+      - key: LOG_LEVEL
+        value: info
+
+  # Filas do BullMQ. `noeviction` é exigido pelo BullMQ para não perder jobs.
+  - type: keyvalue
+    name: imob-redis
+    plan: free
+    region: ohio
+    maxmemoryPolicy: noeviction
+    ipAllowList: []
